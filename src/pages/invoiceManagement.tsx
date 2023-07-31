@@ -37,33 +37,7 @@ const initialFormData = {
       feeafterpay: 0,
       billcode: 1,
     },
-    // {
-    //   id: 4,
-    //   pos: 1,
-    //   money: 0,
-    //   typeOfCard: "",
-    //   fee: 0,
-    //   feeafterpay: 0,
-    //   billcode: 1,
-    // },
-    // {
-    //   id: 3,
-    //   pos: 1,
-    //   money: 0,
-    //   typeOfCard: "",
-    //   fee: 0,
-    //   feeafterpay: 0,
-    //   billcode: 1,
-    // },
-    // {
-    //   id: 4,
-    //   pos: 1,
-    //   money: 0,
-    //   typeOfCard: "",
-    //   fee: 0,
-    //   feeafterpay: 0,
-    //   billcode: 1,
-    // },
+    
   ],
 };
 export default function InvoiceManagementPage() {
@@ -74,13 +48,10 @@ export default function InvoiceManagementPage() {
   const handleClickClose = () => {
     setOpen((open) => !open);
   };
-  const formatMoney =(value: number)=> {
-    const VND = new Intl.NumberFormat('vi-VN', {
-      // style: 'currency',
-      // currency: 'VND',
-    });
+  const formatMoney = (value: number) => {
+    const VND = new Intl.NumberFormat("vi-VN", {});
     return VND.format(value);
-  }
+  };
   const role = "employee";
   const columns = React.useMemo(
     () => [
@@ -101,9 +72,9 @@ export default function InvoiceManagementPage() {
       {
         Header: "Số Tiền Giao Dịch",
         accessor: "totalMoney",
-        Cell: ({row:{values}})=> {
-          return (<>{formatMoney(values.totalMoney)}</>)
-        }
+        Cell: ({ row: { values } }) => {
+          return <>{formatMoney(values.totalMoney)}</>;
+        },
       },
       {
         Header: "Thao Tác",
@@ -159,7 +130,12 @@ export default function InvoiceManagementPage() {
           <h2 style={{ textAlign: "center" }}>QUẢN LÝ HÓA ĐƠN: TÊN NV</h2>
           <TableComponent data={dataFake} columns={columns} pagination={true} />
         </div>
-        <CustomizedDialogs size={"lg"} open={open} title={"Thông Tin Hóa Đơn"} handleClickClose={handleClickClose}>
+        <CustomizedDialogs
+          size={"lg"}
+          open={open}
+          title={"Thông Tin Hóa Đơn"}
+          handleClickClose={handleClickClose}
+        >
           <div className="app">
             <Formik initialValues={formData} enableReinitialize>
               <Form>

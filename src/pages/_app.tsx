@@ -8,11 +8,11 @@ const theme = createTheme();
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ReactQueryProvider>
-      <AuthProvider>
+      {/* <AuthProvider> */}
         <ThemeProvider theme={theme}>
           <Component {...pageProps} />
         </ThemeProvider>
-      </AuthProvider>
+      {/* </AuthProvider> */}
     </ReactQueryProvider>
   );
 }

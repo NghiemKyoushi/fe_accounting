@@ -7,6 +7,7 @@ import InvoiceCreateComponent  from "@/components/invoiceComponent/InvoiceCreate
 import { fetchDataTest } from "@/service/createInvoice";
 const initialFormData = {
   customerName: "",
+  shipFee: 0,
   invoices: [
     {
       id: 1,
@@ -86,7 +87,7 @@ export default function InvoicePage() {
       <DashboardLayout>
         <div className="app">
           <Formik initialValues={formData} enableReinitialize>
-            <Form>
+            <Form >
               <FieldArray name="invoices">
                 {(arrayHelpers: any) => (
                   <InvoiceCreateComponent

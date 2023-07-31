@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useFormikContext, getIn } from "formik";
 import TableComponent from "@/components/TableComponent";
-import Input from "../Input";
+import Input from "../InputForm";
 import Dropdown from "../Dropdown";
 // import styles from "./Invoices.module.css";
 import { Button } from "@mui/material";

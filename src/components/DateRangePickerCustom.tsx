@@ -10,7 +10,6 @@ export default function DateRangePickerCustom() {
  
   return (
     <div>
-     
     </div>
     )
 }

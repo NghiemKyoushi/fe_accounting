@@ -1,8 +1,9 @@
-'use client'
-import PropTypes from 'prop-types';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import GroupIcon from '@mui/icons-material/Group';
-import MenuIcon from '@mui/icons-material/Menu';
+"use client";
+import { useCallback, useRef, useState } from "react";
+import PropTypes from "prop-types";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import GroupIcon from "@mui/icons-material/Group";
+import MenuIcon from "@mui/icons-material/Menu";
 // import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon';
 // import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import {
@@ -13,36 +14,51 @@ import {
   Stack,
   SvgIcon,
   Tooltip,
-  useMediaQuery
-} from '@mui/material';
-import { alpha } from '@mui/material/styles';
-// import { usePopover } from 'src/hooks/use-popover';
-// import { AccountPopover } from './account-popover';
-
+  useMediaQuery,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { AccountPopover } from "./account-popover";
+import { useAuth } from '../../config/auth';
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 50;
 
 export const TopNav = (props) => {
   const { onNavOpen } = props;
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   // const accountPopover = usePopover();
+  // const {user} = useAuth();
+  // console.log("user", user)
+  const anchorRef = useRef(null);
+  const [open, setOpen] = useState(false);
 
+  const handleOpen = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleToggle = useCallback(() => {
+    setOpen((prevState) => !prevState);
+  }, []);
   return (
     <>
       <Box
         component="header"
         sx={{
-          backdropFilter: 'blur(6px)',
-          backgroundColor: (theme) => alpha(theme.palette.background.default, 0.8),
-          position: 'sticky',
+          backdropFilter: "blur(6px)",
+          backgroundColor: (theme) =>
+            alpha(theme.palette.background.default, 0.8),
+          position: "sticky",
           left: {
-            lg: `${SIDE_NAV_WIDTH}px`
+            lg: `${SIDE_NAV_WIDTH}px`,
           },
           top: 0,
           width: {
-            lg: `calc(100% - ${SIDE_NAV_WIDTH}px)`
+            lg: `calc(100% - ${SIDE_NAV_WIDTH}px)`,
           },
-          zIndex: (theme) => theme.zIndex.appBar
+          zIndex: (theme) => theme.zIndex.appBar,
         }}
       >
         <Stack
@@ -52,14 +68,10 @@ export const TopNav = (props) => {
           spacing={2}
           sx={{
             minHeight: TOP_NAV_HEIGHT,
-            px: 2
+            px: 2,
           }}
         >
-          <Stack
-            alignItems="center"
-            direction="row"
-            spacing={2}
-          >
+          <Stack alignItems="center" direction="row" spacing={2}>
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
@@ -67,19 +79,8 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             )}
-            {/* <Tooltip title="Search">
-              <IconButton>
-                <SvgIcon fontSize="small">
-                  <MagnifyingGlassIcon />
-                </SvgIcon>
-              </IconButton>
-            </Tooltip> */}
           </Stack>
-          <Stack
-            alignItems="center"
-            direction="row"
-            spacing={2}
-          >
+          <Stack alignItems="center" direction="row" spacing={2}>
             <Tooltip title="Contacts">
               <IconButton>
                 <SvgIcon fontSize="small">
@@ -89,39 +90,35 @@ export const TopNav = (props) => {
             </Tooltip>
             <Tooltip title="Notifications">
               <IconButton>
-                <Badge
-                  badgeContent={4}
-                  color="success"
-                  variant="dot"
-                >
+                <Badge badgeContent={4} color="success" variant="dot">
                   <SvgIcon fontSize="small">
                     <NotificationsIcon />
                   </SvgIcon>
                 </Badge>
               </IconButton>
             </Tooltip>
-            {/* <Avatar
-              onClick={accountPopover.handleOpen}
-              ref={accountPopover.anchorRef}
+            <Avatar
+              onClick={handleOpen}
+              ref={anchorRef}
               sx={{
-                cursor: 'pointer',
-                height: 40,
-                width: 40
+                cursor: "pointer",
+                height: 30,
+                width: 30,
               }}
-              src="/assets/avatars/avatar-anika-visser.png"
-            /> */}
+              // src="/assets/avatars/avatar-anika-visser.png"
+            />
           </Stack>
         </Stack>
       </Box>
       {/* <AccountPopover
-        anchorEl={accountPopover.anchorRef.current}
-        open={accountPopover.open}
-        onClose={accountPopover.handleClose}
+        anchorEl={anchorRef.current}
+        open={open}
+        onClose={handleClose}
       /> */}
     </>
   );
 };
 
 TopNav.propTypes = {
-  onNavOpen: PropTypes.func
+  onNavOpen: PropTypes.func,
 };

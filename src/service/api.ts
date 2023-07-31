@@ -1,5 +1,5 @@
 import { storage } from "../../utils";
-
+import axiosInstance from "@/config";
 interface AuthResponse {
   user: User;
   jwt: string;
@@ -11,12 +11,12 @@ export interface User {
   name?: string;
 }
 
-const API_URL = "https://my-server/api";
+const API_URL = process.env.BE_BASE_URL;
 
 export async function handleApiResponse(response) {
-  const data = await response.json();
-  if (response.ok) {
-    return data;
+  console.log("data", response.data)
+  if (response.status == 200) {
+    return response.data;
   } else {
     return Promise.reject(data);
   }
@@ -25,18 +25,12 @@ export async function handleApiResponse(response) {
 export async function getUserProfile() {
   return await fetch(`${API_URL}/auth/me`, {
     headers: {
-      Authorization: storage.getToken()
-    }
+      Authorization: storage.getToken(),
+    },
   }).then(handleApiResponse);
 }
 
-export async function loginWithEmailAndPassword(data): Promise<AuthResponse> {
-  console.log("data2", data)
-  return window
-    .fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      body: JSON.stringify(data)
-    })
-    .then(handleApiResponse);
+export async function loginWithEmailAndPassword(data) {
+  console.log("data2", data);
+  return axiosInstance.post(`/api/auth/login`, data).then(handleApiResponse);
 }
-

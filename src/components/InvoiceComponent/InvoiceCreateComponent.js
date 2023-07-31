@@ -1,12 +1,51 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useFormikContext, getIn } from "formik";
 import TableComponent from "@/components/TableComponent";
-import Input from "../Input";
+import Input from "../InputForm";
+import InputComponent from "../InputComponent";
 import Dropdown from "../Dropdown";
 import styles from "./Invoices.module.scss";
 import { Button } from "@mui/material";
 const EMPTY_ARR = [];
 
+export const SumFooter = ({ typeOfInput, value, label }) => {
+  const { values } = useFormikContext();
+  let total;
+  const fee = values.invoices.reduce((total, { fee }) => (total += fee), 0);
+  const money = values.invoices.reduce(
+    (total, { money }) => (total += money),
+    0
+  );
+  switch (typeOfInput) {
+    case "fee":
+      total = fee;
+      break;
+    case "money":
+      total = money;
+      break;
+    case "feeafterpay":
+      total = money - fee;
+      break;
+    case "sumTotalFee":
+      total = money - fee - values.shipFee;
+      break;
+    default:
+      total = value;
+      break;
+    // default statements
+  }
+
+  return (
+    <InputComponent
+      isDisable={label == "" && true}
+      labelWidth={"30%"}
+      name="3"
+      label={label}
+      valueInput={total}
+      type={"number"}
+    />
+  );
+};
 function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   const { values } = useFormikContext();
   console.log("values", values);
@@ -14,6 +53,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   // we use getIn and not values[name] for the case when name is a path like `social.facebook`
   const formikSlice = getIn(values, name) || EMPTY_ARR;
   const [isShowFormAddCard, setIsShowFormAddCard] = useState(false);
+  const [shipFee, setShipFee] = useState(0);
   const onAdd = useCallback(() => {
     const item = {
       id: Math.floor(Math.random() * 100) / 10,
@@ -24,30 +64,23 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
       feeafterpay: 0,
       billcode: 1,
     };
-    // const index = values.invoices.length - 1;
-    handleAdd( item);
+    handleAdd(item);
   }, [handleAdd]);
-  const onRemove = useCallback();
-  (index) => {
-    handleRemove(index);
-  },
-    [handleRemove];
 
+  // const onRemove = useCallback();
+  // (index) => {
+  //   handleRemove(index);
+  // },
+  //   [handleRemove];
   const handleShowFormAddCard = () => {
     setIsShowFormAddCard((isShowFormAddCard) => !isShowFormAddCard);
   };
+  const handleSubmitInvoice = ()=> {}
   const columns = React.useMemo(
     () => [
       {
         Header: "STT",
         Cell: ({ row: { index, original } }) => {
-          // if (+original.id === 1000) {
-          //   return (
-          //     <Button size="small" variant="contained" onClick={onAdd}>
-          //       add
-          //     </Button>
-          //   );
-          // }
           return <div>{Number(index) + 1}</div>;
         },
         Footer: () => {
@@ -55,8 +88,8 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
             <Button size="small" variant="contained" onClick={onAdd}>
               add
             </Button>
-          )
-        }
+          );
+        },
       },
       {
         Header: "MÃ POS",
@@ -64,7 +97,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         Cell: ({ row: { index } }) => {
           return (
             <Dropdown
-            nameForm={`${name}[${index}].pos`}
+              nameForm={`${name}[${index}].pos`}
               value={1}
               label=""
               items={[
@@ -76,8 +109,12 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           );
         },
         Footer: () => {
-          return (<h4>TỔNG</h4>)
-        }
+          return (
+            <div className={styles.div_custom_display}>
+              <h3>TỔNG</h3>
+            </div>
+          );
+        },
       },
       {
         Header: "SỐ TIỀN",
@@ -92,27 +129,24 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           );
         },
         Footer: () => {
-          return (<Input
-            isDisable={false}
-            type={"number"}
-            name={`${name}.money`}
-          />)
-        }
+          return (
+            <div className={styles.div_custom_display}>
+              <SumFooter typeOfInput={"money"} />
+            </div>
+          );
+        },
       },
       {
         Header: "LOẠI THẺ",
         accessor: "typeOfCard",
         Cell: ({ row: { index, original } }) => {
-          if (+original.id === 1000) {
-            return "";
-          }
           return (
             <Input isDisable={false} name={`${name}[${index}].typeOfCard`} />
           );
         },
       },
       {
-        Header: "Tiền PHÍ",
+        Header: "TIỀN PHÍ",
         accessor: "fee",
         Cell: ({ row: { index, original } }) => (
           <Input
@@ -122,63 +156,31 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           />
         ),
         Footer: () => {
-          return (<Input
-            isDisable={false}
-            type={"number"}
-            name={`${name}.fee`}
-          />)
-        }
-      },
-      {
-        Header: "TIỀN SAU PHÍ",
-        accessor: "feeAfter",
-        Cell: ({ row: { index } }) => (
-          <Input
-            isDisable={false}
-            type={"number"}
-            name={`${name}[${index}].feeAfter`}
-          />
-        ),
-        Footer: () => {
-          return (<Input
-            isDisable={false}
-            type={"number"}
-            name={`${name}.feeAfter`}
-          />)
-        }
-      },
-      {
-        Header: "MÃ BILL",
-        accessor: "billcode",
-        Cell: ({ row: { index, original } }) => {
           return (
-            <Dropdown
-              nameForm={`${name}[${index}].billcode`}
-              value={1}
-              label=""
-              items={[
-                { key: "VP01", value: 1 },
-                { key: "ABB-1-24", value: 2 },
-                { key: "EXIM01-35", value: 3 },
-              ]}
-            />
+            <div className={styles.div_custom_display}>
+              <SumFooter typeOfInput={"fee"} />
+            </div>
           );
         },
       },
-      //   {
-      //     Header: "Actions",
-      //     id: "actions",
-      //     Cell: ({ row: { index } }) => (
-      //       <button type="button" onClick={() => onRemove(index)}>
-      //         delete
-      //       </button>
-      //     ),
-      //   },
-    ],
-    [name]
+      {
+        Header: "TIỀN SAU PHÍ",
+        accessor: "feeafterpay",
+        Cell: ({ row: { original } }) => {
+          const restOfFee = original.money - original.fee;
+          return <SumFooter value={restOfFee} />;
+        },
+        Footer: () => {
+          return (
+            <div className={styles.div_custom_display}>
+              <SumFooter typeOfInput={"feeafterpay"} />
+            </div>
+          );
+        },
+      },
+    ],[]
   );
   const [results, setResults] = useState([]);
-
   const fetchData = (value) => {
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((response) => response.json())
@@ -191,7 +193,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
             user.name.toLowerCase().includes(value)
           );
         });
-        console.log("results", results);
+        // console.log("results", results);
         setResults(results);
       });
   };
@@ -275,22 +277,21 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           label="% Phí: "
         />
       </div>
-      <TableComponent data={formikSlice} pagination={true} columns={columns} rowKey="id" />
+      <TableComponent
+        data={formikSlice}
+        pagination={true}
+        columns={columns}
+        rowKey="id"
+      />
       <div style={{ marginTop: 5 }}>
         <Input
-          isDisable={true}
+          isDisable={false}
           labelWidth={"30%"}
-          name="3"
+          name="shipFee"
           label="Tiền Ship: "
-          type={"text"}
+          type={"number"}
         />
-        <Input
-          isDisable={true}
-          labelWidth={"30%"}
-          name="3"
-          label="TỔNG: "
-          type={"text"}
-        />
+        <SumFooter label="Tổng" typeOfInput={"sumTotalFee"} />
       </div>
       <div
         style={{
@@ -308,6 +309,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           style={{ marginLeft: 5 }}
           variant="contained"
           color="info"
+          onClick={()=> handleSubmitInvoice()}
         >
           Lưu Hóa Đơn
         </Button>

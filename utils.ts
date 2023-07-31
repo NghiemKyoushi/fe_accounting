@@ -1,6 +1,8 @@
-export const storage = {
-    getToken: () => JSON.parse(window.localStorage.getItem("token")),
-    setToken: (token: any) =>
-      window.localStorage.setItem("token", JSON.stringify(token)),
-    clearToken: () => window.localStorage.removeItem("token")
+import cookie from 'js-cookie'
+
+export const cookieSetting = {
+    get: () => cookie.get("token"),
+    set: (token: any) =>
+    cookie.set("token", JSON.stringify(token)),
+    clear: () => cookie.remove("token")
   };

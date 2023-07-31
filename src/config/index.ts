@@ -1,7 +1,6 @@
 import axios, { AxiosError, AxiosHeaders } from "axios";
-
 const axiosInstance = axios.create({
-  baseURL: process.env.BE_BASE_URL,
+  baseURL: process.env.BASE_URL,
   headers: {
     "Access-Control-Allow-Origin": "*",
   },

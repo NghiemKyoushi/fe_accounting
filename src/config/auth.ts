@@ -4,22 +4,26 @@ import {
   loginWithEmailAndPassword,
   User
 } from "../service/api";
-import { storage } from "../../utils";
+import { cookieSetting } from "../../utils";
 
-export async function handleUserResponse(data) {
-  const { jwt, user } = data;
-  storage.setToken(jwt);
+export async function handleUserResponse(data: any) {
+  const { jwtToken, userName, roles } = data;
+  cookieSetting.set(jwtToken);
+  const user={
+    roles,
+    userName
+  }
   return user;
 }
 
 async function loadUser() {
-  let user = null;
+  // let user = null;
 
-  if (storage.getToken()) {
-    const data = await getUserProfile();
-    user = data;
-  }
-  return user;
+  // if (storage.getToken()) {
+  //   const data = await getUserProfile();
+  //   user = data;
+  // }
+  return null;
 }
 
 async function loginFn(data) {
@@ -30,13 +34,19 @@ async function loginFn(data) {
 }
 
 async function logoutFn() {
-  await storage.clearToken();
+  await cookieSetting.clear();
+}
+async function registerFn(data) {
+  // const response = await registerWithEmailAndPassword(data);
+  // const user = await handleUserResponse(response);
+  return null;
 }
 
 const authConfig = {
   loadUser,
   loginFn,
-  logoutFn
+  logoutFn,
+  registerFn
 };
 
 const { AuthProvider, useAuth } = initReactQueryAuth<User>(authConfig);

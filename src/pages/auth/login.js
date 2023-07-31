@@ -18,15 +18,15 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../config/auth';
 // import { Layout as AuthLayout } from 'src/layouts/auth/layout';
-
+import axiosInstance from '../../config/index'
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: 'nghiem@gmail.com',
+      password: '12345678',
       submit: null
     },
     validationSchema: Yup.object({
@@ -44,11 +44,11 @@ const Page = () => {
       try {
         console.log("values", values.email)
         const data = {
-          email: values.email,
+          usernameOrEmail: values.email,
           password: values.password
         }
         await auth.login(data);
-        // router.push('/');
+        router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
@@ -173,19 +173,6 @@ const Page = () => {
                   </div>
                 </Alert>
               </form>
-            )}
-            {method === 'phoneNumber' && (
-              <div>
-                <Typography
-                  sx={{ mb: 1 }}
-                  variant="h6"
-                >
-                  Not available in the demo
-                </Typography>
-                <Typography color="text.secondary">
-                  To prevent unnecessary costs we disabled this feature in the demo.
-                </Typography>
-              </div>
             )}
           </div>
         </Box>

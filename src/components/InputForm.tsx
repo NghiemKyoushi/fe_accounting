@@ -2,6 +2,7 @@ import React from "react";
 import { useFormikContext, useField } from "formik";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
+import NumberFormat from "react-number-format";
 import { InputAdornment, IconButton, Autocomplete } from "@mui/material";
 const CustomInput = (props) => {
   return (
@@ -23,7 +24,6 @@ const CustomInput = (props) => {
         backgroundColor: "transparent",
       }}
       // placeholder={props.placeHoder}
-
       id={props.name}
       name={props.name}
       type={props.type}
@@ -31,6 +31,18 @@ const CustomInput = (props) => {
     />
   );
 };
+
+
+function NumberFormatCustom(props) {
+  const { ...other } = props;
+
+  return (
+    <NumberFormat
+      thousandSeparator
+      // isNumericString
+    />
+  );
+}
 interface InputProps {
   name: string;
   label: string;
@@ -43,7 +55,7 @@ interface InputProps {
 function Input(props: InputProps) {
   const { name, label, type, search, results, isDisable, labelWidth } = props;
   const [field] = useField({ name });
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, handleBlur } = useFormikContext();
   if (search) {
     return (
       <div
@@ -120,7 +132,26 @@ function Input(props: InputProps) {
     );
   }
   return (
-    <CustomInput disabled={isDisable} {...field} type={type} width={"80%"} />
+    <>
+      {type === "number" ? (
+        <CustomInput
+          disabled={isDisable}
+          {...field}
+          type={type}
+          width={"80%"}
+          // InputProps={{
+          //   inputComponent: NumberFormatCustom
+          // }}
+        />
+      ) : (
+        <CustomInput
+          disabled={isDisable}
+          {...field}
+          type={type}
+          width={"80%"}
+        />
+      )}
+    </>
   );
 }
 
