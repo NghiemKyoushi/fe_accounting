@@ -6,10 +6,16 @@ import InputComponent from "../InputComponent";
 import Dropdown from "../Dropdown";
 import styles from "./Invoices.module.scss";
 import { Button } from "@mui/material";
+import { useSnackbar } from 'notistack';
+import { fetchCreateInvoice } from "@/service/createInvoice";
 const EMPTY_ARR = [];
 
 export const SumFooter = ({ typeOfInput, value, label }) => {
   const { values } = useFormikContext();
+  const formatMoney = (valueFormat) => {
+    const VND = new Intl.NumberFormat("vi-VN");
+    return VND.format(valueFormat);
+  };
   let total;
   const fee = values.invoices.reduce((total, { fee }) => (total += fee), 0);
   const money = values.invoices.reduce(
@@ -47,13 +53,12 @@ export const SumFooter = ({ typeOfInput, value, label }) => {
   );
 };
 function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
-  const { values } = useFormikContext();
+  const { values,resetForm } = useFormikContext();
   console.log("values", values);
   // from all the form values we only need the "friends" part.
   // we use getIn and not values[name] for the case when name is a path like `social.facebook`
   const formikSlice = getIn(values, name) || EMPTY_ARR;
   const [isShowFormAddCard, setIsShowFormAddCard] = useState(false);
-  const [shipFee, setShipFee] = useState(0);
   const onAdd = useCallback(() => {
     const item = {
       id: Math.floor(Math.random() * 100) / 10,
@@ -75,7 +80,23 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   const handleShowFormAddCard = () => {
     setIsShowFormAddCard((isShowFormAddCard) => !isShowFormAddCard);
   };
-  const handleSubmitInvoice = ()=> {}
+  const handleSubmitInvoice = () => {
+    const receiptArr = values.invoices.map((item) => {
+      return {
+        moneyAmmount: item.money,
+        fee: item.fee,
+        posId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        customerCardId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      };
+    });
+    const bodySend = {
+      receiptStatusEnum: "PENDING",
+      shipmentFee: values.shipFee,
+      receiptBills: receiptArr,
+    };
+    resetForm()
+    // console.log("bodySend", bodySend);
+  };
   const columns = React.useMemo(
     () => [
       {
@@ -139,9 +160,18 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
       {
         Header: "LOẠI THẺ",
         accessor: "typeOfCard",
-        Cell: ({ row: { index, original } }) => {
+        Cell: ({ row: { index } }) => {
           return (
-            <Input isDisable={false} name={`${name}[${index}].typeOfCard`} />
+            <Dropdown
+              nameForm={`${name}[${index}].typeOfCard`}
+              value={1}
+              label=""
+              items={[
+                { key: "VISA", value: 1 },
+                { key: "CREDIT", value: 2 },
+                { key: "VISA0", value: 3 },
+              ]}
+            />
           );
         },
       },
@@ -178,7 +208,8 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           );
         },
       },
-    ],[]
+    ],
+    []
   );
   const [results, setResults] = useState([]);
   const fetchData = (value) => {
@@ -309,7 +340,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           style={{ marginLeft: 5 }}
           variant="contained"
           color="info"
-          onClick={()=> handleSubmitInvoice()}
+          onClick={() => handleSubmitInvoice()}
         >
           Lưu Hóa Đơn
         </Button>

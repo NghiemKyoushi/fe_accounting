@@ -31,17 +31,25 @@ const CustomInput = (props) => {
     />
   );
 };
-
-
+const formatMoney = (value: number) => {
+  const VND = new Intl.NumberFormat("vi-VN", {});
+  return VND.format(value);
+};
 function NumberFormatCustom(props) {
-  const { ...other } = props;
+//   const { inputRef, onChange, ...other } = props;
+//   const [field, meta] = useField(name);
+//   const { setFieldValue } = useFormikContext();
+//   return (
+//     <NumberFormat
+//   value={formik.values.price}
+//   thousandSeparator={true}
+//   onValueChange={(values) => {
+//       const { formattedValue, value } = values
 
-  return (
-    <NumberFormat
-      thousandSeparator
-      // isNumericString
-    />
-  );
+//       setFieldValue(field.name, formattedValue)
+//   }}
+// />
+  // );
 }
 interface InputProps {
   name: string;
@@ -54,8 +62,8 @@ interface InputProps {
 }
 function Input(props: InputProps) {
   const { name, label, type, search, results, isDisable, labelWidth } = props;
-  const [field] = useField({ name });
-  const { setFieldValue, handleBlur } = useFormikContext();
+  const [field, value] = useField({ name });
+  const { setFieldValue } = useFormikContext();
   if (search) {
     return (
       <div
@@ -139,8 +147,9 @@ function Input(props: InputProps) {
           {...field}
           type={type}
           width={"80%"}
+          // inputProps={{ format: "##-##-##" }}
           // InputProps={{
-          //   inputComponent: NumberFormatCustom
+          //   inputComponent: NumberFormatCustom,
           // }}
         />
       ) : (

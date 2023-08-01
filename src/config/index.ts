@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosHeaders } from "axios";
+
 const axiosInstance = axios.create({
   baseURL: process.env.BASE_URL,
   headers: {
@@ -11,6 +12,7 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   function (error) {
+    console.log("error", error)
     // Do something with request error
     return Promise.reject(error);
   }
@@ -21,6 +23,8 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   function (error) {
+    console.log("error", error)
+
     return Promise.reject(error);
   }
 );

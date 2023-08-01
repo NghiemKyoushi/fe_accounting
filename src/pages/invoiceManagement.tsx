@@ -49,7 +49,7 @@ export default function InvoiceManagementPage() {
     setOpen((open) => !open);
   };
   const formatMoney = (value: number) => {
-    const VND = new Intl.NumberFormat("vi-VN", {});
+    const VND = new Intl.NumberFormat("vi-VN");
     return VND.format(value);
   };
   const role = "employee";

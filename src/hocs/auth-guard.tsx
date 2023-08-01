@@ -8,11 +8,11 @@ interface AuthGuardProps{
 }
 import { useAuth } from '../config/auth';
 const AuthGuard = (props: AuthGuardProps) => {
-  // const {user} = useAuth();
-  // console.log('data', user)
+  const {user} = useAuth();
+  console.log('data', user)
   const { children } = props;
-  // const router = useRouter();
-  // const isAuthenticated  = cookieSetting.get();
+  const router = useRouter();
+  const isAuthenticated  = cookieSetting.get();
   // console.log("isAuthenticated",isAuthenticated)
   const ignore = useRef(false);
   // const [checked, setChecked] = useState(false);
@@ -21,8 +21,8 @@ const AuthGuard = (props: AuthGuardProps) => {
   // This flow allows you to manually redirect the user after sign-out, otherwise this will be
   // triggered and will automatically redirect to sign-in page.
 
-  // useEffect(
-  //   () => {
+  useEffect(
+    () => {
       // if (!router.isReady) {
       //   return;
       // }
@@ -34,21 +34,21 @@ const AuthGuard = (props: AuthGuardProps) => {
 
       // ignore.current = true;
 
-  //     if (isAuthenticated === undefined) {
-  //       console.log('Not authenticated, redirecting');
-  //       router
-  //         .replace({
-  //           pathname: '/auth/login',
-  //           query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
-  //         })
-  //         .catch(console.error);
-  //     }
-  //     //  else {
-  //     //   setChecked(true);
-  //     // }
-  //   },
-  //   [router.isReady]
-  // );
+      if (isAuthenticated === undefined) {
+        console.log('Not authenticated, redirecting');
+        router
+          .replace({
+            pathname: '/auth/login',
+            query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
+          })
+          .catch(console.error);
+      }
+      //  else {
+      //   setChecked(true);
+      // }
+    },
+    [router.isReady]
+  );
 
   // if (!checked) {
   //   return null;

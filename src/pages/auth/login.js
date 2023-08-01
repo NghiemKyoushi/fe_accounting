@@ -3,6 +3,7 @@ import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
+import { useSnackbar } from 'notistack';
 import * as Yup from 'yup';
 import {
   Alert,
@@ -23,6 +24,7 @@ const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const [method, setMethod] = useState('email');
+  const { enqueueSnackbar } = useSnackbar();
   const formik = useFormik({
     initialValues: {
       email: 'nghiem@gmail.com',
@@ -47,12 +49,14 @@ const Page = () => {
           usernameOrEmail: values.email,
           password: values.password
         }
-        await auth.login(data);
+        const a=  await auth.login(data);
+        enqueueSnackbar("Đăng nhập thành công!!", { variant: 'success'})
         router.push('/');
       } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
+        enqueueSnackbar("Đăng nhập thất bại !!", { variant: 'error'})
+        // helpers.setStatus({ success: false });
+        // helpers.setErrors({ submit: err.message });
+        // helpers.setSubmitting(false);
       }
     }
   });
