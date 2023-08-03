@@ -5,6 +5,9 @@ import React, { useState, useEffect } from "react";
 import { Formik, Form, FieldArray } from "formik";
 import InvoiceCreateComponent  from "@/components/invoiceComponent/InvoiceCreateComponent";
 import { fetchDataTest } from "@/service/createInvoice";
+import { fetchCustomer } from "@/service/createInvoice";
+import { useQuery } from 'react-query'
+
 const initialFormData = {
   customerName: "",
   shipFee: 0,
@@ -42,6 +45,7 @@ const initialFormData = {
 export default function InvoicePage() {
   const [formData, setFormData] = useState(initialFormData);
   // console.log("first", fetchDataTest());
+  const { data, isFetching, isLoading, error, isError } = useQuery('customer', fetchCustomer)
   useEffect(() => {
     fetchDataTest();
   }, []);

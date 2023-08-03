@@ -8,7 +8,7 @@ import { cookieSetting } from "../../utils";
 
 export async function handleUserResponse(data: any) {
   const { jwtToken, userName, roles } = data;
-  cookieSetting.set(jwtToken);
+  cookieSetting.set('token',jwtToken);
   const user={
     roles,
     userName
@@ -17,17 +17,15 @@ export async function handleUserResponse(data: any) {
 }
 
 async function loadUser() {
-  // let user = null;
-
-  // if (storage.getToken()) {
-  //   const data = await getUserProfile();
-  //   user = data;
-  // }
+  let user = null;
+  if (cookieSetting.get('token') !== undefined) {
+    // const data = await getUserProfile('68350f36-300d-43f1-b4da-922dc5263d9c');
+    // user = data;
+  }
   return null;
 }
 
 async function loginFn(data) {
-  console.log("data 111", data)
   const response = await loginWithEmailAndPassword(data);
   const user = await handleUserResponse(response);
   return user;

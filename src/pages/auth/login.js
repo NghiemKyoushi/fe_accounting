@@ -44,7 +44,6 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        console.log("values", values.email)
         const data = {
           usernameOrEmail: values.email,
           password: values.password

@@ -1,4 +1,4 @@
-import { storage } from "../../utils";
+import { cookieSetting } from "../../utils";
 import axiosInstance from "@/config";
 interface AuthResponse {
   user: User;
@@ -11,22 +11,16 @@ export interface User {
   name?: string;
 }
 
-const API_URL = process.env.BE_BASE_URL;
-
 export async function handleApiResponse(response) {
   if (response.status == 200) {
     return response.data;
   } else {
-    return Promise.reject(data);
+    return Promise.reject(response.data);
   }
 }
 
-export async function getUserProfile() {
-  return await fetch(`${API_URL}/auth/me`, {
-    headers: {
-      Authorization:storage.getToken(),
-    },
-  }).then(handleApiResponse);
+export async function getUserProfile(userId: string) {
+  return await axiosInstance.get(`/api/users/${userId}`).then(handleApiResponse);
 }
 
 export async function loginWithEmailAndPassword(data) {

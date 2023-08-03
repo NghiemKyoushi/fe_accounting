@@ -1,7 +1,6 @@
 import axiosInstance from "../config";
 
 export const fetchDataTest = () => {
-  console.log("fetch data");
   return axiosInstance.get("https://jsonplaceholder.typicode.com/posts/1");
 };
 
@@ -25,3 +24,10 @@ export const fetchCreateInvoice = (props: InvoiceProps) => {
   };
   return axiosInstance.post("/api/receipt", dataSend);
 };
+
+interface CustomerSearchProps {
+  name: string
+}
+export const fetchCustomer = () => {
+  return axiosInstance.get(`/api/customers?name=nghiem`)
+}
