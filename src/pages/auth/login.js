@@ -17,18 +17,39 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useAuth } from '../../config/auth';
 // import { Layout as AuthLayout } from 'src/layouts/auth/layout';
-import axiosInstance from '../../config/index'
+import {loginUserFn}  from '../../api/authApi'
+import { useMutation } from 'react-query';
+import { useStateContext } from '../../context';
+import { cookieSetting } from '../../../utils';
 const Page = () => {
   const router = useRouter();
-  const auth = useAuth();
   const [method, setMethod] = useState('email');
   const { enqueueSnackbar } = useSnackbar();
+
+  const stateContext = useStateContext();
+
+  const { mutate: loginUser, isLoading } = useMutation(
+    (userData) => loginUserFn(userData),
+    {
+      onSuccess: (data) => {
+        stateContext.dispatch({ type: 'SET_USER', payload: data });
+        cookieSetting.set('token', data.jwtToken);
+        cookieSetting.set('userId', data.userId);
+        router.push('/');
+        enqueueSnackbar("Đăng nhập thành công!!", { variant: 'success'})
+        // navigate(from);
+      },
+      onError: (error) => {
+        // console.log(error)
+        enqueueSnackbar("Đăng nhập thất bại !!", { variant: 'error'})
+      },
+    }
+  );
   const formik = useFormik({
     initialValues: {
-      email: 'nghiem@gmail.com',
-      password: '12345678',
+      email: 'employee1@example.com',
+      password: 'employee1234',
       submit: null
     },
     validationSchema: Yup.object({
@@ -43,20 +64,11 @@ const Page = () => {
         .required('Password is required')
     }),
     onSubmit: async (values, helpers) => {
-      try {
         const data = {
           usernameOrEmail: values.email,
           password: values.password
         }
-        const a=  await auth.login(data);
-        enqueueSnackbar("Đăng nhập thành công!!", { variant: 'success'})
-        router.push('/');
-      } catch (err) {
-        enqueueSnackbar("Đăng nhập thất bại !!", { variant: 'error'})
-        // helpers.setStatus({ success: false });
-        // helpers.setErrors({ submit: err.message });
-        // helpers.setSubmitting(false);
-      }
+        loginUser(data)
     }
   });
 

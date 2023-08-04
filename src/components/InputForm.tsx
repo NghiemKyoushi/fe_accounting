@@ -35,22 +35,6 @@ const formatMoney = (value: number) => {
   const VND = new Intl.NumberFormat("vi-VN", {});
   return VND.format(value);
 };
-function NumberFormatCustom(props) {
-//   const { inputRef, onChange, ...other } = props;
-//   const [field, meta] = useField(name);
-//   const { setFieldValue } = useFormikContext();
-//   return (
-//     <NumberFormat
-//   value={formik.values.price}
-//   thousandSeparator={true}
-//   onValueChange={(values) => {
-//       const { formattedValue, value } = values
-
-//       setFieldValue(field.name, formattedValue)
-//   }}
-// />
-  // );
-}
 interface InputProps {
   name: string;
   label: string;
@@ -87,16 +71,20 @@ function Input(props: InputProps) {
           {label}
         </label>
         <Autocomplete
+           
           id="combo-box-demo"
           options={results}
-          getOptionLabel={(option) => option.name}
-          onChange={(e, value) =>
-            setFieldValue("customerName", value?.name || "")
+          getOptionLabel={(option) => option.customerName}
+          onChange={(e, value) =>{
+            console.log("value454545", value)
+            setFieldValue("customerName", value?.customerName || "")
+          }
           }
           sx={{ width: "30%", padding: "0px 32px 0px 0px" }}
           renderInput={(params) => (
             <CustomInput
               {...params}
+              {...field}
               size="small"
               label=""
               placeholder="tìm kiếm chủ thẻ"

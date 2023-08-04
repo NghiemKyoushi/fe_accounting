@@ -6,16 +6,18 @@ import InputComponent from "../InputComponent";
 import Dropdown from "../Dropdown";
 import styles from "./Invoices.module.scss";
 import { Button } from "@mui/material";
-import { useSnackbar } from 'notistack';
+import { useSnackbar } from "notistack";
 import { fetchCreateInvoice } from "@/service/createInvoice";
+import { useStateContext } from "../../context";
+import { useQuery } from "react-query";
+import { fetchCustomer } from "@/service/createInvoice";
+import { useQueryClient } from 'react-query';
+
 const EMPTY_ARR = [];
 
 export const SumFooter = ({ typeOfInput, value, label }) => {
   const { values } = useFormikContext();
-  const formatMoney = (valueFormat) => {
-    const VND = new Intl.NumberFormat("vi-VN");
-    return VND.format(valueFormat);
-  };
+ 
   let total;
   const fee = values.invoices.reduce((total, { fee }) => (total += fee), 0);
   const money = values.invoices.reduce(
@@ -53,8 +55,10 @@ export const SumFooter = ({ typeOfInput, value, label }) => {
   );
 };
 function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
-  const { values,resetForm } = useFormikContext();
+  const { values, resetForm } = useFormikContext();
   console.log("values", values);
+  const stateContext = useStateContext();
+
   // from all the form values we only need the "friends" part.
   // we use getIn and not values[name] for the case when name is a path like `social.facebook`
   const formikSlice = getIn(values, name) || EMPTY_ARR;
@@ -77,6 +81,56 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   //   handleRemove(index);
   // },
   //   [handleRemove];
+  //test
+  const queryClient = useQueryClient();
+// console.log("values.customerName", values.customerName)
+  const [results, setResults] = useState([]);
+//   const {
+//     isLoading,
+//     isFetching,
+//     data: user,
+//   } = useQuery(["searchCustomer",values.customerName], fetchCustomer(values.customerName), {
+//     retry: 1,
+//     // select: (data) => data.userName,
+//     onSuccess: (data) => {
+//       console.log("fetch ,data", data)
+//       const listCustomer = data.map((item) => {
+//         return {
+//           customerName: item.customerName,
+//           customerId: item.customerId,
+//         };
+//       });
+//       setResults(listCustomer);
+//     },
+//     enabled: !!values.customerName
+//   });
+  useEffect(() => {
+    const delayed = setTimeout(() => {
+      queryClient.prefetchQuery(['searchCustomer'], async () => {
+        if (values.customerName.length >1 ) {
+          const data = await fetchCustomer(values.customerName);
+          // if(data.length > 0)
+          console.log("dataa34", data.data)
+          if(data.data.length > 0){
+            const listCustomer =data.data.map((item) => {
+              return{
+                customerName: item.customerName,
+                customerId: item.customerId
+              }
+            })
+            setResults(listCustomer);
+          }
+          // return data;
+        }
+      });
+    }, 300);
+    return () => clearTimeout(delayed);
+  }, [values.customerName]);
+  // fetchCustomer(values.customerName)
+
+  console.log("results", results);
+  useEffect(() => {
+  }, []);
   const handleShowFormAddCard = () => {
     setIsShowFormAddCard((isShowFormAddCard) => !isShowFormAddCard);
   };
@@ -94,8 +148,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
       shipmentFee: values.shipFee,
       receiptBills: receiptArr,
     };
-    resetForm()
-    // console.log("bodySend", bodySend);
+    resetForm();
   };
   const columns = React.useMemo(
     () => [
@@ -211,48 +264,21 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
     ],
     []
   );
-  const [results, setResults] = useState([]);
-  const fetchData = (value) => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((json) => {
-        const results = json.filter((user) => {
-          return (
-            value &&
-            user &&
-            user.name &&
-            user.name.toLowerCase().includes(value)
-          );
-        });
-        // console.log("results", results);
-        setResults(results);
-      });
-  };
-  useEffect(() => {
-    fetchData("n");
-  }, []);
+
   return (
     <div className="field">
       <h2 style={{ textAlign: "center" }}>FORM NHẬP HÓA ĐƠN</h2>
       <div style={{ marginBottom: 5 }}>
-        <Input
-          isDisable={true}
-          labelWidth={"30%"}
-          placeHoder=""
-          name="1"
-          label="Mã Hóa Đơn: "
-          type={"text"}
-        />
-        <Input
+        <InputComponent
           isDisable={true}
           labelWidth={"30%"}
           placeHoder=""
           name="2"
+          valueInput={stateContext.state.authUser?.username}
           label="Nhân viên GD: "
           type={"text"}
         />
         <Input
-          placeHoder=""
           name="customerName"
           search
           results={results}

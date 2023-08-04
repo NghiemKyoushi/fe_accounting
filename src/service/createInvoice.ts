@@ -1,8 +1,4 @@
-import axiosInstance from "../config";
-
-export const fetchDataTest = () => {
-  return axiosInstance.get("https://jsonplaceholder.typicode.com/posts/1");
-};
+import { authApi } from "@/api/authApi";
 
 interface ReceiptBillsDetail {
   moneyAmount: number;
@@ -22,12 +18,12 @@ export const fetchCreateInvoice = (props: InvoiceProps) => {
     shipmentFee,
     receiptBills,
   };
-  return axiosInstance.post("/api/receipt", dataSend);
+  return authApi.post("/api/receipt", dataSend);
 };
 
 interface CustomerSearchProps {
   name: string
 }
-export const fetchCustomer = () => {
-  return axiosInstance.get(`/api/customers?name=nghiem`)
+export const fetchCustomer = (props: CustomerSearchProps) => {
+  return authApi.get(`/api/customers?name=${props}`)
 }

@@ -2,14 +2,14 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from "../theme";
-import { ReactQueryProvider } from "@/config/react-query";
+import { ReactQueryProvider } from "@/api/react-query";
 import { SnackbarProvider, useSnackbar } from "notistack";
-import { AuthProvider } from "@/config/auth";
+import { StateContextProvider } from "@/context/index";
 const theme = createTheme();
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ReactQueryProvider>
-      <AuthProvider>
+      <StateContextProvider>
         <ThemeProvider theme={theme}>
           <SnackbarProvider
             anchorOrigin={{
@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </SnackbarProvider>
         </ThemeProvider>
-      </AuthProvider>
+      </StateContextProvider>
     </ReactQueryProvider>
   );
 }

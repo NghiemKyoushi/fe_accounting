@@ -10,7 +10,6 @@ const EMPTY_ARR = [];
 function InvoiceInfoComponent({ name }) {
   const { values } = useFormikContext();
   const [isEdit, setIsEdit] = useState(true);
-  console.log("values", values);
   const handleEdit = () => {
     setIsEdit((edit) => !edit);
   };

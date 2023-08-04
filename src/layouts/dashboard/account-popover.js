@@ -1,20 +1,20 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
-import { useAuth } from '../../config/auth';
+import { logoutUserFn } from '@/api/authApi';
+import { useStateContext } from '../../context';
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open } = props;
   const router = useRouter();
-  const auth = useAuth();
-
+  const stateContext = useStateContext();
   const handleSignOut = useCallback(
     () => {
       onClose?.();
-      auth.logout();
+      logoutUserFn();
       router.push('/auth/login');
     },
-    [onClose, auth, router]
+    [onClose, router]
   );
 
   return (
@@ -41,7 +41,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          Anika Visser
+          {stateContext.state.authUser?.username}
         </Typography>
       </Box>
       <Divider />

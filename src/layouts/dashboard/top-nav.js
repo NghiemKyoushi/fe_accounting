@@ -18,16 +18,14 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { AccountPopover } from "./account-popover";
-import { useAuth } from '../../config/auth';
+
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 50;
 
 export const TopNav = (props) => {
   const { onNavOpen } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  // const accountPopover = usePopover();
-  const {user} = useAuth();
-  // console.log("user", user)
+  // const accountPopover = usePopover()
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
 
