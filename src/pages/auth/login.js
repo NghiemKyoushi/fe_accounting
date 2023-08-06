@@ -36,7 +36,7 @@ const Page = () => {
         stateContext.dispatch({ type: 'SET_USER', payload: data });
         cookieSetting.set('token', data.jwtToken);
         cookieSetting.set('userId', data.userId);
-        router.push('/');
+        router.push('/invoice');
         enqueueSnackbar("Đăng nhập thành công!!", { variant: 'success'})
         // navigate(from);
       },

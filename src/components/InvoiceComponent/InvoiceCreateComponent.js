@@ -9,15 +9,19 @@ import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { fetchCreateInvoice } from "@/service/createInvoice";
 import { useStateContext } from "../../context";
-import { useQuery } from "react-query";
-import { fetchCustomer } from "@/service/createInvoice";
-import { useQueryClient } from 'react-query';
+import { useQuery, useMutation } from "react-query";
+import {
+  fetchCustomer,
+  fetchPosSearch,
+  fetcCardByCustomerId,
+} from "@/service/createInvoice";
+import { useQueryClient } from "react-query";
 
 const EMPTY_ARR = [];
 
 export const SumFooter = ({ typeOfInput, value, label }) => {
   const { values } = useFormikContext();
- 
+
   let total;
   const fee = values.invoices.reduce((total, { fee }) => (total += fee), 0);
   const money = values.invoices.reduce(
@@ -54,15 +58,58 @@ export const SumFooter = ({ typeOfInput, value, label }) => {
     />
   );
 };
+
+export const InputSearch = ({ name, indexx }) => {
+  const { values, setFieldValue } = useFormikContext();
+  console.log("index34343", indexx);
+  const [result, setResult] = useState([]);
+  // console.log("values333333333", values.invoices[0].pos);
+  const handleChangePos = (valuePos, keyPos) => {
+    setFieldValue(`${name}[${indexx}].pos`, valuePos || "");
+    setFieldValue(`${name}[${indexx}].posId`,keyPos || "");
+  };
+  const { data } = useQuery({
+    queryKey: ["searchPos", values.invoices[indexx]?.pos],
+    queryFn: () => fetchPosSearch(values.invoices[indexx].pos),
+    onSuccess: (data) => {
+      if (data.data.length > 0) {
+        const listPos = data.data.map((item) => {
+          return {
+            value: item.posCode,
+            key: item.posId,
+          };
+        });
+        console.log("listPos", listPos);
+        setResult(listPos);
+      }
+    },
+  });
+  return (
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Input
+        name={`${name}[${indexx}].pos`}
+        search
+        labelWidth={100}
+        placeHoder=""
+        handleChangePos={handleChangePos}
+        results={result}
+        label=""
+        type={"text"}
+      />
+    </div>
+  );
+};
 function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   const { values, resetForm } = useFormikContext();
   console.log("values", values);
   const stateContext = useStateContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   // from all the form values we only need the "friends" part.
   // we use getIn and not values[name] for the case when name is a path like `social.facebook`
   const formikSlice = getIn(values, name) || EMPTY_ARR;
   const [isShowFormAddCard, setIsShowFormAddCard] = useState(false);
+  const [listByCusId, setListByCusId] = useState([]);
   const onAdd = useCallback(() => {
     const item = {
       id: Math.floor(Math.random() * 100) / 10,
@@ -83,54 +130,52 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   //   [handleRemove];
   //test
   const queryClient = useQueryClient();
-// console.log("values.customerName", values.customerName)
   const [results, setResults] = useState([]);
-//   const {
-//     isLoading,
-//     isFetching,
-//     data: user,
-//   } = useQuery(["searchCustomer",values.customerName], fetchCustomer(values.customerName), {
-//     retry: 1,
-//     // select: (data) => data.userName,
-//     onSuccess: (data) => {
-//       console.log("fetch ,data", data)
-//       const listCustomer = data.map((item) => {
-//         return {
-//           customerName: item.customerName,
-//           customerId: item.customerId,
-//         };
-//       });
-//       setResults(listCustomer);
-//     },
-//     enabled: !!values.customerName
-//   });
-  useEffect(() => {
-    const delayed = setTimeout(() => {
-      queryClient.prefetchQuery(['searchCustomer'], async () => {
-        if (values.customerName.length >1 ) {
-          const data = await fetchCustomer(values.customerName);
-          // if(data.length > 0)
-          console.log("dataa34", data.data)
-          if(data.data.length > 0){
-            const listCustomer =data.data.map((item) => {
-              return{
-                customerName: item.customerName,
-                customerId: item.customerId
-              }
-            })
-            setResults(listCustomer);
-          }
-          // return data;
-        }
-      });
-    }, 300);
-    return () => clearTimeout(delayed);
-  }, [values.customerName]);
-  // fetchCustomer(values.customerName)
+  const [searchPort, setSearchPort] = useState([]);
 
-  console.log("results", results);
-  useEffect(() => {
-  }, []);
+  const { data } = useQuery({
+    queryKey: ["searchCustomer", values.customerName],
+    queryFn: () => fetchCustomer(values.customerName),
+    onSuccess: (data) => {
+      if (data.data.length > 0) {
+        const listCustomer = data.data.map((item) => {
+          return {
+            value: item.customerName,
+            key: item.customerId,
+          };
+        });
+        setResults(listCustomer);
+      }
+    },
+  });
+  const cusId = useQuery({
+    queryKey: ["CardTypeByCusId", values.customerId],
+    queryFn: () => fetcCardByCustomerId(values.customerId),
+    onSuccess: (data) => {
+      const formatData = data.data.map((items) => {
+        return {
+          key: items.cardType.cardTypeName,
+          value: items.customerCardId,
+        };
+      });
+      console.log("formatData", formatData);
+      setListByCusId(formatData);
+    },
+  });
+  const mutation = useMutation({
+    mutationFn: (invoiceInfo) => {
+      return fetchCreateInvoice(invoiceInfo);
+    },
+    onSuccess: () => {
+      enqueueSnackbar("Tao hóa đơn thành công!!", { variant: "success" });
+      resetForm();
+    },
+    onError: (err) => {
+      console.log("err", err);
+      enqueueSnackbar("Tạo hóa đơn thất bại!", { variant: "error" });
+    },
+  });
+
   const handleShowFormAddCard = () => {
     setIsShowFormAddCard((isShowFormAddCard) => !isShowFormAddCard);
   };
@@ -139,16 +184,18 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
       return {
         moneyAmmount: item.money,
         fee: item.fee,
-        posId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        customerCardId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        posId: item.posId,
+        customerCardId: item.typeOfCard,
       };
     });
     const bodySend = {
-      receiptStatusEnum: "PENDING",
+      percentageFee: values.percentageFee,
       shipmentFee: values.shipFee,
+      customerId: values.customerId,
       receiptBills: receiptArr,
     };
-    resetForm();
+    console.log("bodySend", bodySend);
+    mutation.mutate(bodySend);
   };
   const columns = React.useMemo(
     () => [
@@ -168,18 +215,31 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
       {
         Header: "MÃ POS",
         accessor: "pos",
-        Cell: ({ row: { index } }) => {
+        Cell: ({ row: { index }, row }) => {
+          console.log("row", index);
           return (
-            <Dropdown
-              nameForm={`${name}[${index}].pos`}
-              value={1}
-              label=""
-              items={[
-                { key: "VP01", value: 1 },
-                { key: "ABB-1-24", value: 2 },
-                { key: "EXIM01-35", value: 3 },
-              ]}
-            />
+            <InputSearch name={name} indexx={index} />
+            // <div style={{ display: "flex", justifyContent: "center" }}>
+            //   <Input
+            //     name={`${name}[${index}].pos`}
+            //     search
+            //     labelWidth={100}
+            //     placeHoder=""
+            //     results={[]}
+            //     label=""
+            //     type={"text"}
+            //   />
+            // </div>
+            // <Dropdown
+            //   nameForm={`${name}[${index}].pos`}
+            //   value={1}
+            //   label=""
+            //   items={[
+            //     { key: "VP01", value: 1 },
+            //     { key: "ABB-1-24", value: 2 },
+            //     { key: "EXIM01-35", value: 3 },
+            //   ]}
+            // />
           );
         },
         Footer: () => {
@@ -217,13 +277,9 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           return (
             <Dropdown
               nameForm={`${name}[${index}].typeOfCard`}
-              value={1}
+              value={null}
               label=""
-              items={[
-                { key: "VISA", value: 1 },
-                { key: "CREDIT", value: 2 },
-                { key: "VISA0", value: 3 },
-              ]}
+              items={listByCusId}
             />
           );
         },
@@ -262,7 +318,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         },
       },
     ],
-    []
+    [listByCusId]
   );
 
   return (
@@ -281,15 +337,15 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         <Input
           name="customerName"
           search
+          placeHoder="Tìm kiếm chủ thẻ"
           results={results}
           label="Tên chủ thẻ: "
           type={"text"}
+          labelWidth={30}
         />
-        <div
-          onClick={handleShowFormAddCard}
-          className={styles.invoice_buttonAdd_container}
-        >
+        <div className={styles.invoice_buttonAdd_container}>
           <Button
+            onClick={handleShowFormAddCard}
             className={styles.invoice_buttonAdd}
             color="info"
             size="medium"
@@ -330,7 +386,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           labelWidth={"30%"}
           placeHoder=""
           disable={true}
-          name="6"
+          name="percentageFee"
           label="% Phí: "
         />
       </div>

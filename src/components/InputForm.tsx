@@ -23,7 +23,6 @@ const CustomInput = (props) => {
         // alignItems: "flex-end",
         backgroundColor: "transparent",
       }}
-      // placeholder={props.placeHoder}
       id={props.name}
       name={props.name}
       type={props.type}
@@ -36,16 +35,28 @@ const formatMoney = (value: number) => {
   return VND.format(value);
 };
 interface InputProps {
-  name: string;
-  label: string;
-  type: string;
-  search: boolean;
-  results: Array<any>;
-  isDisable: boolean;
-  labelWidth: string;
+  name?: string;
+  label?: string;
+  type?: string;
+  search?: boolean;
+  results?: Array<any>;
+  isDisable?: boolean;
+  labelWidth?: string;
+  placeHoder: string;
+  handleChangePos: (valuePos: string, keyPos: string)=> void;
 }
 function Input(props: InputProps) {
-  const { name, label, type, search, results, isDisable, labelWidth } = props;
+  const {
+    name,
+    label,
+    type,
+    search,
+    results,
+    isDisable,
+    labelWidth,
+    placeHoder,
+    handleChangePos
+  } = props;
   const [field, value] = useField({ name });
   const { setFieldValue } = useFormikContext();
   if (search) {
@@ -57,44 +68,48 @@ function Input(props: InputProps) {
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
-          position: "relative",
         }}
       >
-        <label
-          style={{
-            fontWeight: "bolder",
-            width: 110,
-            alignItems: "flex-start",
-          }}
-          htmlFor={name}
-        >
-          {label}
-        </label>
+        {label !== "" && (
+          <label
+            style={{
+              fontWeight: "bolder",
+              width: 110,
+              alignItems: "flex-start",
+            }}
+            htmlFor={name}
+          >
+            {label}
+          </label>
+        )}
         <Autocomplete
-           
           id="combo-box-demo"
           options={results}
-          getOptionLabel={(option) => option.customerName}
-          onChange={(e, value) =>{
-            console.log("value454545", value)
-            setFieldValue("customerName", value?.customerName || "")
-          }
-          }
-          sx={{ width: "30%", padding: "0px 32px 0px 0px" }}
+          getOptionLabel={(option) => option.value}
+          onChange={(e, value) => {
+            console.log("VALUE", value)
+            if (name === "customerName") {
+              setFieldValue("customerName", value?.value || "");
+              setFieldValue("customerId", value?.key || "");
+            }else{
+              handleChangePos(value?.value, value?.key)
+            }
+          }}
+          sx={{ width: `${labelWidth}%`, padding: "0px 32px 0px 0px" }}
           renderInput={(params) => (
             <CustomInput
               {...params}
               {...field}
               size="small"
               label=""
-              placeholder="tìm kiếm chủ thẻ"
+              placeholder={placeHoder}
               width={"100%"}
               disabled={isDisable}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: <SearchIcon />,
-                // disableUnderline: true,
-              }}
+              // InputProps={{
+              //   ...params.InputProps,
+              //   endAdornment: name === "customerName" && <SearchIcon />,
+              //   // disableUnderline: true,
+              // }}
             />
           )}
         />
@@ -135,10 +150,6 @@ function Input(props: InputProps) {
           {...field}
           type={type}
           width={"80%"}
-          // inputProps={{ format: "##-##-##" }}
-          // InputProps={{
-          //   inputComponent: NumberFormatCustom,
-          // }}
         />
       ) : (
         <CustomInput

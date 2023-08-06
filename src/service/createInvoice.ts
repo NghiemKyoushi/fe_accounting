@@ -1,29 +1,33 @@
 import { authApi } from "@/api/authApi";
+import {InvoiceProps,CardByCusIdProps, PosSearchProps, CustomerSearchProps, fetchInvoiceInfoPrams } from './type'
 
-interface ReceiptBillsDetail {
-  moneyAmount: number;
-  fee: number;
-  posId: string;
-  customerCardId: string;
-}
-interface InvoiceProps {
-  receiptStatusEnum: string;
-  shipmentFee: number;
-  receiptBills: Array<ReceiptBillsDetail>;
-}
 export const fetchCreateInvoice = (props: InvoiceProps) => {
-  const { receiptStatusEnum, shipmentFee, receiptBills } = props;
+  const { percentageFee, customerId, shipmentFee, receiptBills } = props;
   const dataSend = {
-    receiptStatusEnum,
+    percentageFee,
+    customerId,
     shipmentFee,
     receiptBills,
   };
-  return authApi.post("/api/receipt", dataSend);
+  return authApi.post("/api/receipts", dataSend);
 };
 
-interface CustomerSearchProps {
-  name: string
-}
+
+export const fetchInvoiceInfo = (param: fetchInvoiceInfoPrams) => {
+  return authApi.get("/api/receipts", {
+    params: param,
+  });
+};
+
+export const fetcCardByCustomerId = (props: CardByCusIdProps) => {
+  return authApi.get(`/api/customer-cards?customerId=${props}`);
+};
+
 export const fetchCustomer = (props: CustomerSearchProps) => {
-  return authApi.get(`/api/customers?name=${props}`)
-}
+  console.log("props", props)
+  return authApi.get(`/api/customers/searchCustomerByName?name=${props}`);
+};
+export const fetchPosSearch = (props: PosSearchProps) => {
+    return authApi.get(`/api/poses/searchByCode?searchKey=${props}`);
+};
+

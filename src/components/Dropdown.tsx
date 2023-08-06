@@ -38,14 +38,14 @@ const DropDown = (props: DropDownProps & FieldHookConfig<string>) => {
         </label>
       )}
       <Select
-        style={{ height: 39 }}
+        style={{ height: 39, fontSize: 13 }}
         defaultValue={value}
         {...field}
         // disableUnderline={true}
         IconComponent={ExpandMoreIcon}
       >
         {items.map((item: any) => (
-          <MenuItem key={item.key} value={item.value}>
+          <MenuItem sx={{fontSize: 13}} key={item.key} value={item.value}>
             {item.key}
           </MenuItem>
         ))}
