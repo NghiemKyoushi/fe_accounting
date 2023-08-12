@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Input from "../InputForm";
+import Input from "../InputForm/InputForm";
 import TableComponent from "@/components/TableComponent";
 import { Field, Form, Formik, getIn, useFormikContext } from "formik";
 import { Button } from "@mui/material";

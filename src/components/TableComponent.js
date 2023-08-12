@@ -28,14 +28,20 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     backgroundColor: neutral[800],
     color: theme.palette.common.white,
     textAlign: "center",
-    padding: "10px 15px",
+    padding: "8px 8px",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     padding: "5px 15px",
   },
 }));
-
+const StyledTable = styled(Table)(({ theme }) => ({
+  root: {
+    width: "100%",
+    marginTop: theme.spacing.unit * 3,
+    overflowX: "auto",
+  },
+}));
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
@@ -81,8 +87,13 @@ function TableReactComponent(props) {
   );
   return (
     <React.Fragment>
-      <TableContainer>
-        <Table aria-label="customized table" {...getTableProps()}>
+      <TableContainer >
+        <Table
+          sx={{ width: "100%", overflowX: "auto", minWidth:800 }}
+          size="small"
+          aria-label="customized table"
+          {...getTableProps()}
+        >
           <TableHead>
             {headerGroups.map((headerGroup) => (
               <StyledTableRow {...headerGroup.getHeaderGroupProps()}>

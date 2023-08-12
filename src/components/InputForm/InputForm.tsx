@@ -1,50 +1,27 @@
 import React from "react";
 import { useFormikContext, useField } from "formik";
 import SearchIcon from "@mui/icons-material/Search";
-import TextField from "@mui/material/TextField";
-import NumberFormat from "react-number-format";
 import { InputAdornment, IconButton, Autocomplete } from "@mui/material";
-const CustomInput = (props) => {
-  return (
-    <TextField
-      sx={{
-        "& .MuiInputBase-input.Mui-disabled": {
-          WebkitTextFillColor: "#000000",
-        },
-      }}
-      disabled={props.disabled}
-      size="small"
-      style={{
-        width: `${props.width}`,
-        // height: 60,
-        padding: "0px 6px",
-        margin: "1px 10px",
-        // boxSizing: "border-box",
-        // alignItems: "flex-end",
-        backgroundColor: "transparent",
-      }}
-      id={props.name}
-      name={props.name}
-      type={props.type}
-      {...props}
-    />
-  );
-};
-const formatMoney = (value: number) => {
-  const VND = new Intl.NumberFormat("vi-VN", {});
-  return VND.format(value);
-};
+import CustomInput from "./InputFormContent";
+import NumberFormat from "./NumberFormat";
+import { NumericFormat, NumericFormatProps } from "react-number-format";
+
+interface resultProps {
+  key: string;
+  value: string;
+}
 interface InputProps {
   name?: string;
   label?: string;
   type?: string;
   search?: boolean;
-  results?: Array<any>;
+  results?: Array<resultProps>;
   isDisable?: boolean;
   labelWidth?: string;
   placeHoder: string;
-  handleChangePos: (valuePos: string, keyPos: string)=> void;
+  handleChangeType: (valueType: string, keyType: string) => void;
 }
+
 function Input(props: InputProps) {
   const {
     name,
@@ -55,9 +32,9 @@ function Input(props: InputProps) {
     isDisable,
     labelWidth,
     placeHoder,
-    handleChangePos
+    handleChangeType,
   } = props;
-  const [field, value] = useField({ name });
+  const [field] = useField({ name });
   const { setFieldValue } = useFormikContext();
   if (search) {
     return (
@@ -84,15 +61,19 @@ function Input(props: InputProps) {
         )}
         <Autocomplete
           id="combo-box-demo"
-          options={results}
+          options={results || []}
           getOptionLabel={(option) => option.value}
-          onChange={(e, value) => {
-            console.log("VALUE", value)
+          onChange={(e, valueChange) => {
             if (name === "customerName") {
-              setFieldValue("customerName", value?.value || "");
-              setFieldValue("customerId", value?.key || "");
-            }else{
-              handleChangePos(value?.value, value?.key)
+              setFieldValue("customerName", valueChange?.value || "");
+              setFieldValue("customerId", valueChange?.key || "");
+            } else if(name === "typeOfCard"){
+              setFieldValue("typeOfCard", valueChange?.value || "");
+              setFieldValue("typeOfCardId", valueChange?.key || "");
+            } else{
+                if (valueChange?.value) {
+                handleChangeType(valueChange?.value, valueChange?.key);
+              }
             }
           }}
           sx={{ width: `${labelWidth}%`, padding: "0px 32px 0px 0px" }}
@@ -146,10 +127,12 @@ function Input(props: InputProps) {
     <>
       {type === "number" ? (
         <CustomInput
-          disabled={isDisable}
           {...field}
-          type={type}
+          // type={type}
           width={"80%"}
+          InputProps={{
+            inputComponent: NumberFormat as any,
+          }}
         />
       ) : (
         <CustomInput

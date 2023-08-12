@@ -1,7 +1,13 @@
 import React from "react";
-// import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
-// import { InputAdornment, IconButton, Autocomplete } from "@mui/material";
+interface InputProps {
+  label: string;
+  type: string;
+  isDisable: boolean;
+  labelWidth: string;
+  valueInput: number;
+  handleChange: () => void;
+}
 const CustomInput = (props) => {
   return (
     <TextField
@@ -26,14 +32,6 @@ const CustomInput = (props) => {
     />
   );
 };
-interface InputProps {
-  label: string;
-  type: string;
-  isDisable: boolean;
-  labelWidth: string;
-  valueInput: number;
-  handleChange: () => void;
-}
 function InputComponent(props: InputProps) {
   const { label, type, valueInput, isDisable, labelWidth } = props;
   if (label) {

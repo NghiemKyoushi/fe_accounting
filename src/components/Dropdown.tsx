@@ -24,6 +24,7 @@ const DropDown = (props: DropDownProps & FieldHookConfig<string>) => {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
+        width:'100%'
       }}
     >
       {label !== "" && (
@@ -31,17 +32,15 @@ const DropDown = (props: DropDownProps & FieldHookConfig<string>) => {
           style={{
             fontWeight: "bolder",
             width: 110,
-            alignItems: "flex-start",
-          }}
-        >
+            // alignItems: "flex-start",
+          }}>
           {label}
         </label>
       )}
       <Select
-        style={{ height: 39, fontSize: 13 }}
+        style={{ width: '30%', height: 39, fontSize: 13 }}
         defaultValue={value}
         {...field}
-        // disableUnderline={true}
         IconComponent={ExpandMoreIcon}
       >
         {items.map((item: any) => (

@@ -8,6 +8,7 @@ import { Formik, Form, FieldArray } from "formik";
 import { useQuery } from "react-query";
 import InvoiceInfoComponent from "@/components/InvoiceInfoComponent/InvoiceInfoComponent";
 import { fetchInvoiceInfo } from "@/service/createInvoice";
+import moment from "moment";
 const initialFormData = {
   customerName: "",
   invoices: [
@@ -106,6 +107,9 @@ export default function InvoiceManagementPage() {
       {
         Header: "Ngày Tạo Hóa Đơn",
         accessor: "createdDate",
+        Cell: ({ row:{original}}) => {
+          return <div>{moment(original?.createdDate).format('DD/MM/YYYY-h:mm:ss')}</div>;
+        },
       },
       {
         Header: "Mã Hóa Đơn",
@@ -146,28 +150,6 @@ export default function InvoiceManagementPage() {
     ],
     []
   );
-  const dataFake = [
-    {
-      date: "25/07/2023",
-      billCode: "SON270823TS-1",
-      totalMoney: 50000000,
-    },
-    {
-      date: "25/07/2023",
-      billCode: "SON270823TS-1",
-      totalMoney: 50000000,
-    },
-    {
-      date: "25/07/2023",
-      billCode: "SON270823TS-1",
-      totalMoney: 50000000,
-    },
-    {
-      date: "25/07/2023",
-      billCode: "SON270823TS-1",
-      totalMoney: 50000000,
-    },
-  ];
   return (
     <>
       <DashboardLayout>

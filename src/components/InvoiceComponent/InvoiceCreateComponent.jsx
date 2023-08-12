@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useFormikContext, getIn } from "formik";
 import TableComponent from "@/components/TableComponent";
-import Input from "../InputForm";
+import Input from "../InputForm/InputForm";
 import InputComponent from "../InputComponent";
 import Dropdown from "../Dropdown";
 import styles from "./Invoices.module.scss";
@@ -16,13 +16,14 @@ import {
   fetcCardByCustomerId,
 } from "@/service/createInvoice";
 import { useQueryClient } from "react-query";
-
+import FormNumberField from "../FormNumberField/FormNumberField";
+import FormattedInputs from "@/components/InputComponents";
 const EMPTY_ARR = [];
 
-export const SumFooter = ({ typeOfInput, value, label }) => {
+export const SumFooter = ({ typeOfInput, value, label, width }) => {
   const { values } = useFormikContext();
-
   let total;
+
   const fee = values.invoices.reduce((total, { fee }) => (total += fee), 0);
   const money = values.invoices.reduce(
     (total, { money }) => (total += money),
@@ -48,29 +49,33 @@ export const SumFooter = ({ typeOfInput, value, label }) => {
   }
 
   return (
-    <InputComponent
-      isDisable={label == "" && true}
-      labelWidth={"30%"}
-      name="3"
+    // <h1>HUHUH</h1>
+    <FormattedInputs
+      disable={true}
+      type="number"
       label={label}
-      valueInput={total}
-      type={"number"}
+      width={width}
+      name="typeOfInput"
+      numberformat={total.toString()}
     />
   );
 };
 
 export const InputSearch = ({ name, indexx }) => {
   const { values, setFieldValue } = useFormikContext();
-  console.log("index34343", indexx);
   const [result, setResult] = useState([]);
-  // console.log("values333333333", values.invoices[0].pos);
   const handleChangePos = (valuePos, keyPos) => {
     setFieldValue(`${name}[${indexx}].pos`, valuePos || "");
-    setFieldValue(`${name}[${indexx}].posId`,keyPos || "");
+    setFieldValue(`${name}[${indexx}].posId`, keyPos || "");
+  };
+  const handleChangeCardType = (valueCard, keyCard) => {
+    setFieldValue("typeOfCard", valueCard || "");
+    setFieldValue("typeOfCardId", keyCard || "");
   };
   const { data } = useQuery({
     queryKey: ["searchPos", values.invoices[indexx]?.pos],
     queryFn: () => fetchPosSearch(values.invoices[indexx].pos),
+    enabled: !!values.invoices[indexx]?.pos,
     onSuccess: (data) => {
       if (data.data.length > 0) {
         const listPos = data.data.map((item) => {
@@ -91,7 +96,7 @@ export const InputSearch = ({ name, indexx }) => {
         search
         labelWidth={100}
         placeHoder=""
-        handleChangePos={handleChangePos}
+        handleChangeType={handleChangePos}
         results={result}
         label=""
         type={"text"}
@@ -104,9 +109,6 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   console.log("values", values);
   const stateContext = useStateContext();
   const { enqueueSnackbar } = useSnackbar();
-
-  // from all the form values we only need the "friends" part.
-  // we use getIn and not values[name] for the case when name is a path like `social.facebook`
   const formikSlice = getIn(values, name) || EMPTY_ARR;
   const [isShowFormAddCard, setIsShowFormAddCard] = useState(false);
   const [listByCusId, setListByCusId] = useState([]);
@@ -136,6 +138,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   const { data } = useQuery({
     queryKey: ["searchCustomer", values.customerName],
     queryFn: () => fetchCustomer(values.customerName),
+    enabled: !!values.customerName,
     onSuccess: (data) => {
       if (data.data.length > 0) {
         const listCustomer = data.data.map((item) => {
@@ -151,11 +154,12 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
   const cusId = useQuery({
     queryKey: ["CardTypeByCusId", values.customerId],
     queryFn: () => fetcCardByCustomerId(values.customerId),
+    enabled: !!values.customerId,
     onSuccess: (data) => {
       const formatData = data.data.map((items) => {
         return {
-          key: items.cardType.cardTypeName,
-          value: items.customerCardId,
+          value: items.cardType.cardTypeName,
+          key: items.customerCardId,
         };
       });
       console.log("formatData", formatData);
@@ -171,7 +175,6 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
       resetForm();
     },
     onError: (err) => {
-      console.log("err", err);
       enqueueSnackbar("Tạo hóa đơn thất bại!", { variant: "error" });
     },
   });
@@ -185,7 +188,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         moneyAmmount: item.money,
         fee: item.fee,
         posId: item.posId,
-        customerCardId: item.typeOfCard,
+        customerCardId: values.typeOfCardId,
       };
     });
     const bodySend = {
@@ -207,7 +210,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         Footer: () => {
           return (
             <Button size="small" variant="contained" onClick={onAdd}>
-              add
+              Thêm
             </Button>
           );
         },
@@ -216,30 +219,8 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         Header: "MÃ POS",
         accessor: "pos",
         Cell: ({ row: { index }, row }) => {
-          console.log("row", index);
           return (
             <InputSearch name={name} indexx={index} />
-            // <div style={{ display: "flex", justifyContent: "center" }}>
-            //   <Input
-            //     name={`${name}[${index}].pos`}
-            //     search
-            //     labelWidth={100}
-            //     placeHoder=""
-            //     results={[]}
-            //     label=""
-            //     type={"text"}
-            //   />
-            // </div>
-            // <Dropdown
-            //   nameForm={`${name}[${index}].pos`}
-            //   value={1}
-            //   label=""
-            //   items={[
-            //     { key: "VP01", value: 1 },
-            //     { key: "ABB-1-24", value: 2 },
-            //     { key: "EXIM01-35", value: 3 },
-            //   ]}
-            // />
           );
         },
         Footer: () => {
@@ -254,13 +235,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         Header: "SỐ TIỀN",
         accessor: "money",
         Cell: ({ row: { index } }) => {
-          return (
-            <Input
-              isDisable={false}
-              type={"number"}
-              name={`${name}[${index}].money`}
-            />
-          );
+          return <FormNumberField name={`${name}[${index}].money`} />;
         },
         Footer: () => {
           return (
@@ -271,28 +246,10 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
         },
       },
       {
-        Header: "LOẠI THẺ",
-        accessor: "typeOfCard",
-        Cell: ({ row: { index } }) => {
-          return (
-            <Dropdown
-              nameForm={`${name}[${index}].typeOfCard`}
-              value={null}
-              label=""
-              items={listByCusId}
-            />
-          );
-        },
-      },
-      {
         Header: "TIỀN PHÍ",
         accessor: "fee",
         Cell: ({ row: { index, original } }) => (
-          <Input
-            isDisable={false}
-            type={"number"}
-            name={`${name}[${index}].fee`}
-          />
+          <FormNumberField name={`${name}[${index}].fee`} />
         ),
         Footer: () => {
           return (
@@ -323,7 +280,7 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
 
   return (
     <div className="field">
-      <h2 style={{ textAlign: "center" }}>FORM NHẬP HÓA ĐƠN</h2>
+      <h3 style={{ textAlign: "center" }}>FORM NHẬP HÓA ĐƠN</h3>
       <div style={{ marginBottom: 5 }}>
         <InputComponent
           isDisable={true}
@@ -382,6 +339,21 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
             />
           </div>
         )}
+        {/* <Dropdown
+          nameForm={"typeOfCard"}
+          value={null}
+          label="Loại thẻ"
+          items={listByCusId}
+        /> */}
+        <Input
+          name="typeOfCard"
+          search
+          placeHoder="Tìm kiếm loại thẻ"
+          results={listByCusId}
+          label="Loại thẻ: "
+          type={"text"}
+          labelWidth={30}
+        />
         <Input
           labelWidth={"30%"}
           placeHoder=""
@@ -390,12 +362,23 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           label="% Phí: "
         />
       </div>
-      <TableComponent
-        data={formikSlice}
-        pagination={true}
-        columns={columns}
-        rowKey="id"
-      />
+      <div
+        style={{
+          display: "flex",
+          alignContent: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ width: "85%" }}>
+          <TableComponent
+            data={formikSlice}
+            pagination={false}
+            columns={columns}
+            rowKey="id"
+          />
+        </div>
+      </div>
+
       <div style={{ marginTop: 5 }}>
         <Input
           isDisable={false}
@@ -404,19 +387,28 @@ function InvoiceCreateComponent({ name, handleAdd, handleRemove }) {
           label="Tiền Ship: "
           type={"number"}
         />
-        <SumFooter label="Tổng" typeOfInput={"sumTotalFee"} />
+        <SumFooter width="30%" label="Tổng" typeOfInput={"sumTotalFee"} />
       </div>
       <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          marginRight: "10%",
+          marginRight: "2%",
           marginTop: 5,
+          paddingBottom: 15,
         }}
       >
-        <Button size="medium" variant="contained" color="warning">
-          Tải Ảnh Chứng từ
-        </Button>
+        <label htmlFor="upload-photo">
+          <input
+            style={{ display: "none" }}
+            id="upload-photo"
+            name="upload-photo"
+            type="file"
+          />
+          <Button color="secondary" variant="contained" component="span">
+            Tải ảnh chứng từ
+          </Button>{" "}
+        </label>
         <Button
           size="medium"
           style={{ marginLeft: 5 }}
