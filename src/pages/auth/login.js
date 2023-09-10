@@ -41,15 +41,14 @@ const Page = () => {
         // navigate(from);
       },
       onError: (error) => {
-        // console.log(error)
         enqueueSnackbar("Đăng nhập thất bại !!", { variant: 'error'})
       },
     }
   );
   const formik = useFormik({
     initialValues: {
-      email: 'employee1@example.com',
-      password: 'employee1234',
+      email: 'nghiemdd1@gmail.com',
+      password: '12345678',
       submit: null
     },
     validationSchema: Yup.object({

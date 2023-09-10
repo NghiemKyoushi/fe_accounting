@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 "use client";
 import React from "react";
-import { useTable, usePagination } from "react-table";
+import { useTable, usePagination, useExpanded } from "react-table";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import {
   Table,
@@ -23,12 +23,16 @@ import {
 } from "@mui/material";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { useForm } from "react-hook-form";
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: neutral[800],
-    color: theme.palette.common.white,
+    backgroundColor: "#edeef2",
+    color: "#151114",
     textAlign: "center",
-    padding: "8px 8px",
+    padding: "6px 6px",
+    fontSize: 13,
+    border: "10px solid #d4d9d6",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -36,26 +40,42 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 const StyledTable = styled(Table)(({ theme }) => ({
+  "& .MuiTableCell-root": {
+    border: "1px solid #d4d9d6",
+  },
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3,
+    // marginTop: theme.spacing.unit * 3,
     overflowX: "auto",
   },
 }));
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: "#ffffff",
     alignItem: "center",
+    border: "1px solid #d4d9d6",
   },
   // hide last border
   "&:last-child td, &:last-child th": {
-    border: 0,
+    border: "1px solid #d4d9d6",
   },
 }));
 
-function TableReactComponent(props) {
-  const { columns, data, updateMyData, skipPageReset, editTable, pagination } =
-    props;
+export interface TableComponentProps {
+  columns: Array<any>;
+  data: Array<any>;
+  pagination: boolean;
+  isFooter: boolean;
+}
+function TableReactComponent(props: TableComponentProps) {
+  const {
+    columns,
+    data,
+    // skipPageReset,
+    pagination,
+    // renderRowSubComponent,
+    isFooter,
+  } = props;
   const {
     getTableProps,
     getTableBodyProps,
@@ -72,24 +92,25 @@ function TableReactComponent(props) {
     previousPage,
     setPageIndex,
     setPageSize,
-    state: { pageIndex, pageSize },
+    state: { pageIndex, pageSize, expanded },
   } = useTable(
     {
       columns,
       data,
-
+      initialState: { expanded: { 0: true } },
       // defaultColumn: editTable === false ? undefined : defaultColumn,
       // use the skipPageReset option to disable page resetting temporarily
       // autoResetPage: !skipPageReset,
       // updateMyData,
     },
+    useExpanded,
     usePagination
   );
   return (
     <React.Fragment>
-      <TableContainer >
-        <Table
-          sx={{ width: "100%", overflowX: "auto", minWidth:800 }}
+      <TableContainer>
+        <StyledTable
+          sx={{ width: "100%", overflowX: "auto", minWidth: 800 }}
           size="small"
           aria-label="customized table"
           {...getTableProps()}
@@ -117,22 +138,30 @@ function TableReactComponent(props) {
                       </StyledTableCell>
                     );
                   })}
+                  {/* {row.isExpanded ? (
+                <tr>
+                  <td colSpan={visibleColumns.length}>
+                    {renderRowSubComponent({ row })}
+                  </td>
+                </tr>
+              ) : null} */}
                 </StyledTableRow>
               );
             })}
           </TableBody>
           <TableFooter>
-            {footerGroups.map((group) => (
-              <StyledTableRow {...group.getFooterGroupProps()}>
-                {group.headers.map((column) => (
-                  <StyledTableCell {...column.getFooterProps()}>
-                    {column.render("Footer")}
-                  </StyledTableCell>
-                ))}
-              </StyledTableRow>
-            ))}
+            {isFooter &&
+              footerGroups.map((group) => (
+                <StyledTableRow {...group.getFooterGroupProps()}>
+                  {group.headers.map((column) => (
+                    <StyledTableCell {...column.getFooterProps()}>
+                      {column.render("Footer")}
+                    </StyledTableCell>
+                  ))}
+                </StyledTableRow>
+              ))}
           </TableFooter>
-        </Table>
+        </StyledTable>
       </TableContainer>
       {pagination && (
         <div
@@ -156,7 +185,6 @@ function TableReactComponent(props) {
             >
               {[5, 10, 15, 20, 25, 30].map((pageSize) => (
                 <MenuItem key={pageSize} value={pageSize}>
-                  {" "}
                   {pageSize}
                 </MenuItem>
               ))}
@@ -191,15 +219,14 @@ function TableReactComponent(props) {
     </React.Fragment>
   );
 }
-
-function TableComponent(props) {
-  const { editTable, data, columns, pagination } = props;
+function TableComponent(props: TableComponentProps) {
+  const { data, columns, pagination, isFooter } = props;
   return (
     <>
       <TableReactComponent
-        editTable={editTable}
         columns={columns}
         data={data}
+        isFooter={isFooter}
         pagination={pagination}
       />
     </>

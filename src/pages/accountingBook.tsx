@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { Layout as DashboardLayout } from "@/layouts/dashboard/layout";
 import CustomizedDialogs from "@/components/DialogComponent";
-import AccountingBookComponent from "@/components/AccountingBookComponent/AccountingBookComponent";
+import AccountingBookComponent from "@/components/Page/AccountingBookComponent/AccountingBookComponent";
 import { Formik, Form, FieldArray } from "formik";
 import { Button } from "@mui/material";
 const initialData={
@@ -20,15 +20,8 @@ export default function AccountingBookPage() {
   return (
     <div>
       <DashboardLayout>
-        <h2 style={{ textAlign: "center" }}>SỔ THU CHI: TÂY SƠN</h2>
-        <Formik initialValues={formData} enableReinitialize>
-          <Form>
+        <h3 style={{ textAlign: "center" }}>SỔ THU CHI: TÂY SƠN</h3>
           <AccountingBookComponent/>
-            {/* <FieldArray name="invoices"> */}
-              {/* {(arrayHelpers: any) => <AccountingBook />} */}
-            {/* </FieldArray> */}
-          </Form>
-        </Formik>
         {/* <CustomizedDialogs
           size={"lg"}
           open={open}

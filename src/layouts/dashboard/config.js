@@ -8,7 +8,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 export const items = [
   {
-    title: 'Overview',
+    title: 'Tổng quan',
     path: '/',
     icon: (
       <SvgIcon fontSize="small">
@@ -35,7 +35,7 @@ export const items = [
     )
   },
   {
-    title: 'Sổ Kế Toán',
+    title: 'Sổ Thu Chi',
     path: '/accountingBook',
     icon: (
       <SvgIcon fontSize="small">

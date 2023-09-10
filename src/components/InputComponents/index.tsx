@@ -27,15 +27,15 @@ const NumericFormatCustom = React.forwardRef<NumericFormatProps, CustomProps>(
         //     },
         //   });
         // }}
-        thousandSeparator={"."}
-        decimalSeparator={","}
+        thousandSeparator={","}
+        // decimalSeparator={"."}
       />
     );
   }
 );
 
 interface State {
-  numberformat: string;
+  valueInput: string;
   nameInput: string;
   label: string;
   width: string;
@@ -44,8 +44,7 @@ interface State {
 }
 
 export default function FormattedInputs(props: State) {
-  console.log("props.label", props.label);
-  const { numberformat, nameInput, label, width, disable, type } = props;
+  const { valueInput, nameInput, label, width, disable, type } = props;
   return (
     <div
       className="field"
@@ -58,7 +57,7 @@ export default function FormattedInputs(props: State) {
     >
       {label !== undefined && (
         <label
-          style={{ fontWeight: "bolder", width: 110, alignItems: "flex-start" }}
+          style={{ fontWeight: "bolder", width: 110, fontSize:14 }}
         >
           {label}
         </label>
@@ -68,6 +67,7 @@ export default function FormattedInputs(props: State) {
           "& .MuiInputBase-input.Mui-disabled": {
             WebkitTextFillColor: "#000000",
           },
+          
         }}
         // disabled={props.disabled}
         size="small"
@@ -78,13 +78,12 @@ export default function FormattedInputs(props: State) {
           margin: "1px 10px",
           backgroundColor: "transparent",
         }}
-        value={numberformat}
-        // onChange={handleChange}
+        value={valueInput}
         name={nameInput}
-        id="formatted-numberformat-input"
+        id="formatted-valueInput-input"
         disabled={disable}
         InputProps={{
-          inputComponent: type === 'number' && NumericFormatCustom as any,
+          inputComponent: type=='number' ? NumericFormatCustom as any : null,
         }}
       />
     </div>

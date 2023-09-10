@@ -6,8 +6,11 @@ export interface ReceiptBillsDetail {
 }
 export interface InvoiceProps {
   percentageFee: number;
-  customerId: string;
+  branchId: string;
   shipmentFee: number;
+  customerCardId:string;
+  imageId:string;
+
   receiptBills: Array<ReceiptBillsDetail>;
 }
 export interface CustomerSearchProps {

@@ -27,7 +27,6 @@ const AuthGuard = (props: AuthGuardProps) => {
   const { children } = props;
   const router = useRouter();
   const isAuthenticated = cookieSetting.get("token");
-  // console.log("isAuthenticated",isAuthenticated)
   const ignore = useRef(false);
   // const [checked, setChecked] = useState(false);
 
