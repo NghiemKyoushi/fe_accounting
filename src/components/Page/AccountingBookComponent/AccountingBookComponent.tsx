@@ -29,6 +29,7 @@ import {
 import _ from "lodash";
 import { enqueueSnackbar } from "notistack";
 import { STATUS_CODE } from "@/models/InvoiceManagement";
+import { getDateOfPresent } from "../../../../utils";
 
 const rowActions = {
   CREATE: "CREATE",
@@ -61,7 +62,7 @@ function AccountingBookComponent() {
 
   const initialInvoiceSearch = {
     branchId: stateContext.state?.authUser?.branches[0]?.branchId,
-    entryBookDate: "10-09-2023",
+    entryBookDate: getDateOfPresent(),
     // entryCodeSearchKey: "",
     page: 0,
     pageSize: 10,
@@ -201,9 +202,9 @@ function AccountingBookComponent() {
           }
           return <div></div>;
         },
-        Footer: () => {
-          return <></>;
-        },
+        // Footer: () => {
+        //   return <></>;
+        // },
       },
       {
         Header: "Công Nợ ",
@@ -214,17 +215,17 @@ function AccountingBookComponent() {
           }
           return <div></div>;
         },
-        Footer: () => {
-          return <></>;
-        },
+        // Footer: () => {
+        //   return <></>;
+        // },
       },
-      // {
-      //   Header: "Thu Nợ ",
-      //   accesser: "debtCollection",
-      //   Footer: () => {
-      //     return <h1></h1>;
-      //   },
-      // },
+      {
+        Header: "Thu Nợ ",
+        // accesser: "debtCollection",
+        // Footer: () => {
+        //   return <h1></h1>;
+        // },
+      },
       {
         Header: "Thao Tác",
         id: "actions",

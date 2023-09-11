@@ -25,6 +25,7 @@ interface InputProps {
   placeHoder: string;
   control: Control;
   setValue: UseFormSetValue<any>;
+  isRequired: boolean;
 }
 
 function SelectSearchComponent(props: InputProps) {
@@ -38,6 +39,7 @@ function SelectSearchComponent(props: InputProps) {
     control,
     nameOnChange,
     setValue,
+    isRequired,
   } = props;
 
   return (
@@ -75,7 +77,6 @@ function SelectSearchComponent(props: InputProps) {
                 return option?.values ? option?.values : "";
               }}
               value={value ?? ""}
-              
               // inputValue={ value[value] ?? value[value] ?? ""}
               onChange={(event, selectedOptions, reason) => {
                 if (reason === "clear") {
@@ -95,6 +96,7 @@ function SelectSearchComponent(props: InputProps) {
                   {...params}
                   size="small"
                   label=""
+                  required={isRequired}
                   placeholder={placeHoder}
                   width={"100%"}
                   disabled={isDisable}

@@ -27,7 +27,7 @@ const RECEIPT_STATUS = {
 };
 const enumSorter = {
   EMPLOYEE: "EMPLOYEE",
-  CREATION_DATE: "CREATION_DATE",
+  CREATED_DATE: "CREATED_DATE",
   POS: "POS",
   CUSTOMER_CARD: "CUSTOMER_CARD",
 };
@@ -39,9 +39,9 @@ const initialInvoiceSearch = {
   // startDate: '',
   // endDate: '',
   page: 0,
-  pageSize: 10,
-  sorter: enumSorter.EMPLOYEE,
-  sortDirection: "ASC",
+  pageSize: 20,
+  sorter: enumSorter.CREATED_DATE,
+  sortDirection: "DESC",
 };
 const InvoiceManagement = () => {
   const [open, setOpen] = useState(false);

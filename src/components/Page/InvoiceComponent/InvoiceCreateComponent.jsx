@@ -18,11 +18,11 @@ import { IconButton } from "@mui/material";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormCurrencyField } from "@/components/FormNumberField/FormNumberField";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import AddIcon from "@mui/icons-material/Add";
-import Stack from "@mui/material/Stack";
 import Uploader from "@/components/Uploader/Uploader";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
+import _ from "lodash";
+import * as Yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export const SumFooter = ({ typeOfInput, value, label, width, watch }) => {
   let total;
@@ -45,9 +45,10 @@ export const SumFooter = ({ typeOfInput, value, label, width, watch }) => {
       if (watch().percentageFee === undefined || watch().percentageFee === 0) {
         total = money - fee - watch().shipFee;
       } else if (watch().shipFee === undefined || watch().shipFee === 0) {
-      } else {
         total =
-          (money - fee) - (money - fee) * (+watch().percentageFee/100) - +watch().shipFee;
+          money - fee - (money - fee) * _.toNumber(watch().percentageFee / 100);
+      } else {
+        total = money - fee;
       }
 
       break;
@@ -94,6 +95,7 @@ export const InputSearchPos = ({ name, index, setValue, watch, control }) => {
         placeHoder=""
         results={result}
         label=""
+        isRequired={false}
         type={"text"}
         setValue={setValue}
         labelWidth={"100"}
@@ -106,6 +108,10 @@ function InvoiceCreateComponent() {
   const { enqueueSnackbar } = useSnackbar();
   const [isShowFormAddCard, setIsShowFormAddCard] = useState(false);
   const [listByCusId, setListByCusId] = useState([]);
+  const validationSchema = Yup.object().shape({
+    customerInfo: Yup.string().min(1, { message: "Required" }),
+    percentageFee: Yup.string().min(1, { message: "Required" }),
+  });
   const { control, handleSubmit, getValues, reset, setValue, watch } = useForm({
     shouldUnregister: false,
     defaultValues: {
@@ -149,7 +155,9 @@ function InvoiceCreateComponent() {
         },
       ],
     },
+    // resolver: yupResolver(validationSchema),
   });
+  console.log("watch", watch());
   const { fields: invoicesField, append } = useFieldArray({
     control,
     name: "invoices",
@@ -242,7 +250,8 @@ function InvoiceCreateComponent() {
   const handleShowFormAddCard = () => {
     setIsShowFormAddCard((isShowFormAddCard) => !isShowFormAddCard);
   };
-  const handleSubmitInvoice = () => {
+  const handleSubmitInvoice = async () => {
+    console.log("hdhdhđ8748474744747");
     const receiptArr = watch().invoices.map((item) => {
       return {
         moneyAmount: item.money,
@@ -370,7 +379,11 @@ function InvoiceCreateComponent() {
             </div>
           );
         },
-      },  return (
+      },
+    ],
+    []
+  );
+  return (
     <form onSubmit={handleSubmit(handleSubmitInvoice)}>
       <h3 style={{ textAlign: "center" }}>FORM NHẬP HÓA ĐƠN</h3>
       <HeaderPage>
@@ -392,6 +405,7 @@ function InvoiceCreateComponent() {
           type={"text"}
           setValue={setValue}
           labelWidth={30}
+          isRequired={true}
         />
 
         {/* <div className={styles.invoice_buttonAdd_container}>
@@ -501,7 +515,7 @@ function InvoiceCreateComponent() {
           style={{ marginLeft: 5 }}
           variant="contained"
           color="info"
-          onClick={() => handleSubmitInvoice()}
+          type="submit" // onClick={() => handleSubmitInvoice()}
         >
           Tạo Hóa Đơn
         </Button>

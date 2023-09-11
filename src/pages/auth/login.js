@@ -149,7 +149,7 @@ const Page = () => {
                   />
                 </Stack>
                 <FormHelperText sx={{ mt: 1 }}>
-                  Optionally you can skip.
+                  {/* Optionally you can skip. */}
                 </FormHelperText>
                 {formik.errors.submit && (
                   <Typography
